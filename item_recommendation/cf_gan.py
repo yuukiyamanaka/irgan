@@ -1,7 +1,7 @@
 import tensorflow as tf
 from dis_model import DIS
 from gen_model import GEN
-import cPickle
+import pickle as cPickle
 import numpy as np
 import utils as ut
 import multiprocessing
@@ -51,8 +51,7 @@ with open(workdir + 'movielens-100k-test.txt')as fin:
                 user_pos_test[uid] = [iid]
 
 all_users = user_pos_train.keys()
-all_users.sort()
-
+sorted(all_users)
 
 def dcg_at_k(r, k):
     r = np.asfarray(r)[:k]
@@ -100,7 +99,7 @@ def simple_test(sess, model):
     result = np.array([0.] * 6)
     pool = multiprocessing.Pool(cores)
     batch_size = 128
-    test_users = user_pos_test.keys()
+    test_users = list(user_pos_test.keys())
     test_user_num = len(test_users)
     index = 0
     while True:
@@ -140,8 +139,9 @@ def generate_for_d(sess, model, filename):
 
 
 def main():
-    print "load model..."
-    param = cPickle.load(open(workdir + "model_dns_ori.pkl"))
+    print("load model...")
+    with open(workdir + "model_dns_ori.pkl", 'rb') as model_pkl:
+        param = cPickle.load(model_pkl, encoding="bytes")
     generator = GEN(ITEM_NUM, USER_NUM, EMB_DIM, lamda=0.0 / BATCH_SIZE, param=param, initdelta=INIT_DELTA,
                     learning_rate=0.001)
     discriminator = DIS(ITEM_NUM, USER_NUM, EMB_DIM, lamda=0.1 / BATCH_SIZE, param=None, initdelta=INIT_DELTA,
@@ -152,8 +152,8 @@ def main():
     sess = tf.Session(config=config)
     sess.run(tf.global_variables_initializer())
 
-    print "gen ", simple_test(sess, generator)
-    print "dis ", simple_test(sess, discriminator)
+    print("gen ", simple_test(sess, generator))
+    print("dis ", simple_test(sess, discriminator))
 
     dis_log = open(workdir + 'dis_log.txt', 'w')
     gen_log = open(workdir + 'gen_log.txt', 'w')
@@ -208,14 +208,14 @@ def main():
                                  {generator.u: u, generator.i: sample, generator.reward: reward})
 
                 result = simple_test(sess, generator)
-                print "epoch ", epoch, "gen: ", result
+                print("epoch ", epoch, "gen: ", result)
                 buf = '\t'.join([str(x) for x in result])
                 gen_log.write(str(epoch) + '\t' + buf + '\n')
                 gen_log.flush()
 
                 p_5 = result[1]
                 if p_5 > best:
-                    print 'best: ', result
+                    print('best: ', result)
                     best = p_5
                     generator.save_model(sess, "ml-100k/gan_generator.pkl")
 

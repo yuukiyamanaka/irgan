@@ -1,6 +1,6 @@
 import tensorflow as tf
 from dis_model_pairwise_nn import DIS
-import cPickle
+import pickle as cPickle
 import utils as ut
 from eval.map import MAP
 from eval.mrr import MRR

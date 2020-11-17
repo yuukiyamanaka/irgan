@@ -1,7 +1,7 @@
 import tensorflow as tf
 from dis_model_pairwise_nn import DIS
 from gen_model_nn import GEN
-import cPickle
+import pickle as cPickle
 import utils as ut
 import numpy as np
 import random
