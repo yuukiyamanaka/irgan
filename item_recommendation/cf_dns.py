@@ -47,8 +47,7 @@ with open(workdir + 'movielens-100k-test.txt')as fin:
                 user_pos_test[uid] = [iid]
 
 all_users = user_pos_train.keys()
-all_users.sort()
-
+sorted(all_users)
 
 def generate_dns(sess, model, filename):
     data = []
@@ -117,7 +116,7 @@ def simple_test(sess, model):
     result = np.array([0.] * 6)
     pool = multiprocessing.Pool(cores)
     batch_size = 128
-    test_users = user_pos_test.keys()
+    test_users = list(user_pos_test.keys())
     test_user_num = len(test_users)
     index = 0
     while True:
